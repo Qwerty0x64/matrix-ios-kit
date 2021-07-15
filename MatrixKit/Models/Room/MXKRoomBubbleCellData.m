@@ -183,7 +183,7 @@
                         }
                         else
                         {
-                            NSLog(@"[MXKRoomBubbleCellData] updateEvent: Warning: Does not support change of attachment type");
+                            MXLogDebug(@"[MXKRoomBubbleCellData] updateEvent: Warning: Does not support change of attachment type");
                         }
                     }
                 }
@@ -427,7 +427,7 @@
     
     if (firstComponent)
     {
-        CGFloat positionY = (attachment == nil || attachment.type == MXKAttachmentTypeFile || attachment.type == MXKAttachmentTypeAudio) ? MXKROOMBUBBLECELLDATA_TEXTVIEW_DEFAULT_VERTICAL_INSET : 0;
+        CGFloat positionY = (attachment == nil || attachment.type == MXKAttachmentTypeFile || attachment.type == MXKAttachmentTypeAudio || attachment.type == MXKAttachmentTypeVoiceMessage) ? MXKROOMBUBBLECELLDATA_TEXTVIEW_DEFAULT_VERTICAL_INSET : 0;
         firstComponent.position = CGPointMake(0, positionY);
     }
 }

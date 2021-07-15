@@ -292,7 +292,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
     self = [super initWithMatrixSession:matrixSession];
     if (self)
     {
-        //NSLog(@"[MXKRoomDataSource] initWithRoomId %p - room id: %@", self, roomId);
+        //MXLogDebug(@"[MXKRoomDataSource] initWithRoomId %p - room id: %@", self, roomId);
         
         _roomId = roomId;
         _secondaryRoomEventTypes = @[
@@ -451,7 +451,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
                 outgoingMessage.sentState == MXEventSentStateEncrypting ||
                 outgoingMessage.sentState == MXEventSentStateUploading)
             {
-                NSLog(@"[MXKRoomDataSource] cancel limitMemoryUsage because some messages are being sent");
+                MXLogDebug(@"[MXKRoomDataSource] cancel limitMemoryUsage because some messages are being sent");
                 return;
             }
         }
@@ -580,7 +580,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
 
 - (void)reloadNotifying:(BOOL)notify
 {
-    //    NSLog(@"[MXKRoomDataSource] Reload %p - room id: %@", self, _roomId);
+    //    MXLogDebug(@"[MXKRoomDataSource] Reload %p - room id: %@", self, _roomId);
     
     [self setState:MXKDataSourceStatePreparing];
     
@@ -592,7 +592,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
 
 - (void)destroy
 {
-    NSLog(@"[MXKRoomDataSource] Destroy %p - room id: %@", self, _roomId);
+    MXLogDebug(@"[MXKRoomDataSource] Destroy %p - room id: %@", self, _roomId);
     
     [self unregisterScanManagerNotifications];
     [self unregisterReactionsChangeListener];
@@ -781,7 +781,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
                         
                         MXStrongifyAndReturnIfNil(self);
 
-                        NSLog(@"[MXKRoomDataSource] Failed to resetPaginationAroundInitialEventWithLimit");
+                        MXLogDebug(@"[MXKRoomDataSource] Failed to resetPaginationAroundInitialEventWithLimit");
 
                         // Notify the error
                         [[NSNotificationCenter defaultCenter] postNotificationName:kMXKRoomDataSourceTimelineError
@@ -794,7 +794,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
             }
             else
             {
-                NSLog(@"[MXKRoomDataSource] Warning: The user does not know the room %@", _roomId);
+                MXLogDebug(@"[MXKRoomDataSource] Warning: The user does not know the room %@", _roomId);
                 
                 // Update here data source state if it is not already ready
                 [self setState:MXKDataSourceStateFailed];
@@ -833,7 +833,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
 
                         } failure:^(NSError *error) {
 
-                            NSLog(@"[MXKRoomDataSource] group profile update failed %@", groupId);
+                            MXLogDebug(@"[MXKRoomDataSource] group profile update failed %@", groupId);
 
                             if (self.delegate && !(--count))
                             {
@@ -922,7 +922,11 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
                     }
                 }
 
-                if (nil == localEcho)
+                if (self.secondaryRoom)
+                {
+                    [self reloadNotifying:NO];
+                }
+                else if (nil == localEcho)
                 {
                     // Process here incoming events, and outgoing events sent from another device.
                     [self queueEventForProcessing:event withRoomState:roomState direction:MXTimelineDirectionForwards];
@@ -1071,7 +1075,8 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
                 if (nil == localEcho)
                 {
                     // Process here incoming events, and outgoing events sent from another device.
-                    [self reloadNotifying:NO];
+                    [self queueEventForProcessing:event withRoomState:roomState direction:MXTimelineDirectionForwards];
+                    [self processQueuedEvents:nil];
                 }
             }
         }];
@@ -1405,7 +1410,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
     
     if (paginationRequest || secondaryPaginationRequest)
     {
-        NSLog(@"[MXKRoomDataSource] paginate: a pagination is already in progress");
+        MXLogDebug(@"[MXKRoomDataSource] paginate: a pagination is already in progress");
         if (failure)
         {
             failure(nil);
@@ -1415,7 +1420,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
     
     if (NO == [self canPaginate:direction])
     {
-        NSLog(@"[MXKRoomDataSource] paginate: No more events to paginate");
+        MXLogDebug(@"[MXKRoomDataSource] paginate: No more events to paginate");
         if (success)
         {
             success(0);
@@ -1462,7 +1467,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
         
     } failure:^(NSError *error) {
         
-        NSLog(@"[MXKRoomDataSource] paginateBackMessages fails");
+        MXLogDebug(@"[MXKRoomDataSource] paginateBackMessages fails");
         
         MXStrongifyAndReturnIfNil(self);
         
@@ -1526,7 +1531,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
             
         } failure:^(NSError *error) {
             
-            NSLog(@"[MXKRoomDataSource] paginateBackMessages fails");
+            MXLogDebug(@"[MXKRoomDataSource] paginateBackMessages fails");
             
             MXStrongifyAndReturnIfNil(self);
             
@@ -1574,14 +1579,14 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
 
 - (void)paginateToFillRect:(CGRect)rect direction:(MXTimelineDirection)direction withMinRequestMessagesCount:(NSUInteger)minRequestMessagesCount success:(void (^)(void))success failure:(void (^)(NSError *error))failure
 {
-    NSLog(@"[MXKRoomDataSource] paginateToFillRect: %@", NSStringFromCGRect(rect));
+    MXLogDebug(@"[MXKRoomDataSource] paginateToFillRect: %@", NSStringFromCGRect(rect));
     
     // During the first call of this method, the delegate is supposed defined.
     // This delegate may be removed whereas this method is called by itself after a pagination request.
     // The delegate is required here to be able to compute cell height (and prevent infinite loop in case of reentrancy).
     if (!self.delegate)
     {
-        NSLog(@"[MXKRoomDataSource] paginateToFillRect ignored (delegate is undefined)");
+        MXLogDebug(@"[MXKRoomDataSource] paginateToFillRect ignored (delegate is undefined)");
         if (failure)
         {
             failure(nil);
@@ -1611,7 +1616,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
                 if (bubblesTotalHeight > rect.size.height)
                 {
                     // No need to compute more cells heights, there are enough to fill the rect
-                    NSLog(@"[MXKRoomDataSource] -> %tu already loaded bubbles (%tu events) are enough to fill the screen", bubbles.count - i, eventsCount);
+                    MXLogDebug(@"[MXKRoomDataSource] -> %tu already loaded bubbles (%tu events) are enough to fill the screen", bubbles.count - i, eventsCount);
                     break;
                 }
                 
@@ -1622,7 +1627,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
     }
     else if (minRequestMessagesCount && [self canPaginate:direction])
     {
-        NSLog(@"[MXKRoomDataSource] paginateToFillRect: Prefill with data from the store");
+        MXLogDebug(@"[MXKRoomDataSource] paginateToFillRect: Prefill with data from the store");
         // Give a chance to load data from the store before doing homeserver requests
         // Reuse minRequestMessagesCount because we need to provide a number.
         [self paginate:minRequestMessagesCount direction:direction onlyFromStore:YES success:^(NSUInteger addedCellNumber) {
@@ -1651,7 +1656,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
             // So, use minRequestMessagesCount
             messagesToLoad = MAX(messagesToLoad, minRequestMessagesCount);
             
-            NSLog(@"[MXKRoomDataSource] paginateToFillRect: need to paginate %tu events to cover %fpx", messagesToLoad, rect.size.height - bubblesTotalHeight);
+            MXLogDebug(@"[MXKRoomDataSource] paginateToFillRect: need to paginate %tu events to cover %fpx", messagesToLoad, rect.size.height - bubblesTotalHeight);
             [self paginate:messagesToLoad direction:direction onlyFromStore:NO success:^(NSUInteger addedCellNumber) {
                 
                 [self paginateToFillRect:rect direction:direction withMinRequestMessagesCount:minRequestMessagesCount success:success failure:failure];
@@ -1661,7 +1666,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
         else
         {
             
-            NSLog(@"[MXKRoomDataSource] paginateToFillRect: No more events to paginate");
+            MXLogDebug(@"[MXKRoomDataSource] paginateToFillRect: No more events to paginate");
             if (success)
             {
                 success();
@@ -1848,9 +1853,15 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
 
 - (void)sendVideo:(NSURL *)videoLocalURL withThumbnail:(UIImage *)videoThumbnail success:(void (^)(NSString *))success failure:(void (^)(NSError *))failure
 {
+    AVURLAsset *videoAsset = [AVURLAsset assetWithURL:videoLocalURL];
+    [self sendVideoAsset:videoAsset withThumbnail:videoThumbnail success:success failure:failure];
+}
+
+- (void)sendVideoAsset:(AVAsset *)videoAsset withThumbnail:(UIImage *)videoThumbnail success:(void (^)(NSString *))success failure:(void (^)(NSError *))failure
+{
     __block MXEvent *localEchoEvent = nil;
     
-    [_room sendVideo:videoLocalURL withThumbnail:videoThumbnail localEcho:&localEchoEvent success:success failure:failure];
+    [_room sendVideoAsset:videoAsset withThumbnail:videoThumbnail localEcho:&localEchoEvent success:success failure:failure];
     
     if (localEchoEvent)
     {
@@ -1859,6 +1870,40 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
         [self processQueuedEvents:nil];
     }
 }
+
+- (void)sendAudioFile:(NSURL *)audioFileLocalURL mimeType:mimeType success:(void (^)(NSString *))success failure:(void (^)(NSError *))failure
+{
+    __block MXEvent *localEchoEvent = nil;
+    
+    [_room sendAudioFile:audioFileLocalURL mimeType:mimeType localEcho:&localEchoEvent success:success failure:failure keepActualFilename:YES];
+    
+    if (localEchoEvent)
+    {
+        // Make the data source digest this fake local echo message
+        [self queueEventForProcessing:localEchoEvent withRoomState:self.roomState direction:MXTimelineDirectionForwards];
+        [self processQueuedEvents:nil];
+    }
+}
+
+- (void)sendVoiceMessage:(NSURL *)audioFileLocalURL
+                mimeType:mimeType
+                duration:(NSTimeInterval)duration
+                 samples:(NSArray<NSNumber *> *)samples
+                 success:(void (^)(NSString *))success
+                 failure:(void (^)(NSError *))failure
+{
+    __block MXEvent *localEchoEvent = nil;
+    
+    [_room sendVoiceMessage:audioFileLocalURL mimeType:mimeType duration:duration samples:samples localEcho:&localEchoEvent success:success failure:failure keepActualFilename:YES];
+    
+    if (localEchoEvent)
+    {
+        // Make the data source digest this fake local echo message
+        [self queueEventForProcessing:localEchoEvent withRoomState:self.roomState direction:MXTimelineDirectionForwards];
+        [self processQueuedEvents:nil];
+    }
+}
+
 
 - (void)sendFile:(NSURL *)fileLocalURL mimeType:(NSString*)mimeType success:(void (^)(NSString *))success failure:(void (^)(NSError *))failure
 {
@@ -1914,7 +1959,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
         return;
     }
     
-    NSLog(@"[MXKRoomDataSource] resendEventWithEventId. EventId: %@", event.eventId);
+    MXLogDebug(@"[MXKRoomDataSource] resendEventWithEventId. EventId: %@", event.eventId);
     
     // Check first whether the event is encrypted
     if ([event.wireType isEqualToString:kMXEventTypeStringRoomEncrypted])
@@ -1966,7 +2011,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
                 }
                 else
                 {
-                    NSLog(@"[MXKRoomDataSource] resendEventWithEventId: Warning - Unable to resend room message of type: %@", msgType);
+                    MXLogDebug(@"[MXKRoomDataSource] resendEventWithEventId: Warning - Unable to resend room message of type: %@", msgType);
                 }
             }
             else
@@ -1983,7 +2028,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
             if (contentURL && [contentURL hasPrefix:kMXMediaUploadIdPrefix])
             {
                 // TODO: Support resend on attached video when upload has been failed.
-                NSLog(@"[MXKRoomDataSource] resendEventWithEventId: Warning - Unable to resend attached video (upload was not complete)");
+                MXLogDebug(@"[MXKRoomDataSource] resendEventWithEventId: Warning - Unable to resend attached video (upload was not complete)");
             }
             else
             {
@@ -2017,7 +2062,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
                 }
                 else
                 {
-                    NSLog(@"[MXKRoomDataSource] resendEventWithEventId: Warning - Unable to resend room message of type: %@", msgType);
+                    MXLogDebug(@"[MXKRoomDataSource] resendEventWithEventId: Warning - Unable to resend room message of type: %@", msgType);
                 }
             }
             else
@@ -2028,12 +2073,12 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
         }
         else
         {
-            NSLog(@"[MXKRoomDataSource] resendEventWithEventId: Warning - Unable to resend room message of type: %@", msgType);
+            MXLogDebug(@"[MXKRoomDataSource] resendEventWithEventId: Warning - Unable to resend room message of type: %@", msgType);
         }
     }
     else
     {
-        NSLog(@"[MXKRoomDataSource] MXKRoomDataSource: Warning - Only resend of MXEventTypeRoomMessage is allowed. Event.type: %@", event.type);
+        MXLogDebug(@"[MXKRoomDataSource] MXKRoomDataSource: Warning - Only resend of MXEventTypeRoomMessage is allowed. Event.type: %@", event.type);
     }
 }
 
@@ -2177,23 +2222,26 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
 {
     // Add the unsent messages at the end of the conversation
     NSArray<MXEvent*>* outgoingMessages = _room.outgoingMessages;
-    BOOL shouldProcessQueuedEvents = NO;
     
-    for (NSInteger index = 0; index < outgoingMessages.count; index++)
-    {
-        MXEvent *outgoingMessage = [outgoingMessages objectAtIndex:index];
+    [self.mxSession decryptEvents:outgoingMessages inTimeline:nil onComplete:^(NSArray<MXEvent *> *failedEvents) {
+        BOOL shouldProcessQueuedEvents = NO;
         
-        if (outgoingMessage.sentState != MXEventSentStateSent)
+        for (NSInteger index = 0; index < outgoingMessages.count; index++)
         {
-            [self queueEventForProcessing:outgoingMessage withRoomState:self.roomState direction:MXTimelineDirectionForwards];
-            shouldProcessQueuedEvents = YES;
+            MXEvent *outgoingMessage = [outgoingMessages objectAtIndex:index];
+            
+            if (outgoingMessage.sentState != MXEventSentStateSent)
+            {
+                [self queueEventForProcessing:outgoingMessage withRoomState:self.roomState direction:MXTimelineDirectionForwards];
+                shouldProcessQueuedEvents = YES;
+            }
         }
-    }
-    
-    if (shouldProcessQueuedEvents)
-    {
-        [self processQueuedEvents:nil];
-    }
+        
+        if (shouldProcessQueuedEvents)
+        {
+            [self processQueuedEvents:nil];
+        }
+    }];
 }
 
 #pragma mark - Bubble collapsing
@@ -2387,7 +2435,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
     if (self.mxSession == room.mxSession &&
         ([self.roomId isEqualToString:room.roomId] || [self.secondaryRoomId isEqualToString:room.roomId]))
     { 
-        NSLog(@"[MXKRoomDataSource] didMXRoomInitialSynced for room: %@", room.roomId);
+        MXLogDebug(@"[MXKRoomDataSource] didMXRoomInitialSynced for room: %@", room.roomId);
         
         [[NSNotificationCenter defaultCenter] removeObserver:self name:kMXRoomInitialSyncNotification object:room];
         
@@ -2439,7 +2487,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
         }
         
         // Inform the delegate
-        if (self.delegate)
+        if (self.delegate && (self.secondaryRoom ? bubbles.count > 0 : YES))
         {
             [self.delegate dataSource:self didCellChange:nil];
         }
@@ -3486,12 +3534,12 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
                 break;
             }
 
-            NSLog(@"[MXKRoomDataSource] addReadReceipts: Read receipts for an event(%@) that is not displayed", eventId);
+            MXLogDebug(@"[MXKRoomDataSource] addReadReceipts: Read receipts for an event(%@) that is not displayed", eventId);
         }
 
         if (!areReadReceiptsAssigned)
         {
-            NSLog(@"[MXKRoomDataSource] addReadReceipts: Try to attach read receipts to an older message: %@", eventId);
+            MXLogDebug(@"[MXKRoomDataSource] addReadReceipts: Try to attach read receipts to an older message: %@", eventId);
 
             // Try to assign RRs to a previous cell data
             if (cellDataIndex >= 1)
@@ -3500,7 +3548,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
             }
             else
             {
-                NSLog(@"[MXKRoomDataSource] addReadReceipts: Fail to attach read receipts for an event(%@)", eventId);
+                MXLogDebug(@"[MXKRoomDataSource] addReadReceipts: Fail to attach read receipts for an event(%@)", eventId);
             }
         }
     }
@@ -3643,7 +3691,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
         // Retrieve at least the group profile
         [self.mxSession updateGroupProfile:group success:nil failure:^(NSError *error) {
             
-            NSLog(@"[MXKRoomDataSource] groupWithGroupId: group profile update failed %@", groupId);
+            MXLogDebug(@"[MXKRoomDataSource] groupWithGroupId: group profile update failed %@", groupId);
             
         }];
     }
@@ -3773,7 +3821,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
 - (void)addReaction:(NSString *)reaction forEventId:(NSString *)eventId success:(void (^)(void))success failure:(void (^)(NSError *))failure
 {
     [self.mxSession.aggregations addReaction:reaction forEvent:eventId inRoom:self.roomId success:success failure:^(NSError * _Nonnull error) {
-        NSLog(@"[MXKRoomDataSource] Fail to send reaction on eventId: %@", eventId);
+        MXLogDebug(@"[MXKRoomDataSource] Fail to send reaction on eventId: %@", eventId);
         if (failure)
         {
             failure(error);
@@ -3784,7 +3832,7 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
 - (void)removeReaction:(NSString *)reaction forEventId:(NSString *)eventId success:(void (^)(void))success failure:(void (^)(NSError *))failure
 {
     [self.mxSession.aggregations removeReaction:reaction forEvent:eventId inRoom:self.roomId success:success failure:^(NSError * _Nonnull error) {
-        NSLog(@"[MXKRoomDataSource] Fail to unreact on eventId: %@", eventId);
+        MXLogDebug(@"[MXKRoomDataSource] Fail to unreact on eventId: %@", eventId);
         if (failure)
         {
             failure(error);
@@ -3899,12 +3947,6 @@ NSString *const kMXKRoomDataSourceTimelineErrorErrorKey = @"kMXKRoomDataSourceTi
                 if (![event.unsignedData.relations.replace.eventId isEqualToString:replaceEvent.eventId])
                 {
                     editedEvent = [event editedEventFromReplacementEvent:replaceEvent];
-
-                    // Make sure the edited event is decrypted
-                    if (editedEvent.isEncrypted && !editedEvent.clearEvent)
-                    {
-                        [self.mxSession decryptEvent:editedEvent inTimeline:nil];
-                    }
                 }
                 break;
             }

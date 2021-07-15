@@ -95,6 +95,10 @@ NSString *const kMXKAttachmentErrorDomain = @"kMXKAttachmentErrorDomain";
             {
                 _type = MXKAttachmentTypeImage;
             }
+            else if (event.isVoiceMessage)
+            {
+                _type = MXKAttachmentTypeVoiceMessage;
+            }
             else if ([msgtype isEqualToString:kMXMessageTypeAudio])
             {
                 _type = MXKAttachmentTypeAudio;
@@ -193,11 +197,6 @@ NSString *const kMXKAttachmentErrorDomain = @"kMXKAttachmentErrorDomain";
 
 - (NSString *)getThumbnailMimeType
 {
-    if (thumbnailFile)
-    {
-        return thumbnailFile.mimetype;
-    }
-    
     return _thumbnailInfo[@"mimetype"];
 }
 
@@ -293,7 +292,7 @@ NSString *const kMXKAttachmentErrorDomain = @"kMXKAttachmentErrorDomain";
             NSOutputStream *outstream = [[NSOutputStream alloc] initToMemory];
             NSError *err = [MXEncryptedAttachments decryptAttachment:self->thumbnailFile inputStream:instream outputStream:outstream];
             if (err) {
-                NSLog(@"Error decrypting attachment! %@", err.userInfo);
+                MXLogDebug(@"Error decrypting attachment! %@", err.userInfo);
                 if (onFailure) onFailure(self, err);
                 return;
             }
@@ -311,6 +310,7 @@ NSString *const kMXKAttachmentErrorDomain = @"kMXKAttachmentErrorDomain";
         else
         {
             [_mediaManager downloadEncryptedMediaFromMatrixContentFile:thumbnailFile
+                                                              mimeType:_thumbnailMimeType
                                                               inFolder:_eventRoomId
                                                                success:^(NSString *outputFilePath) {
                                                                    decryptAndCache();
@@ -401,7 +401,7 @@ NSString *const kMXKAttachmentErrorDomain = @"kMXKAttachmentErrorDomain";
             NSError *err = [MXEncryptedAttachments decryptAttachment:self->contentFile inputStream:instream outputStream:outstream];
             if (err)
             {
-                NSLog(@"Error decrypting attachment! %@", err.userInfo);
+                MXLogDebug(@"Error decrypting attachment! %@", err.userInfo);
                 return;
             }
             onSuccess([outstream propertyForKey:NSStreamDataWrittenToMemoryStreamKey]);
@@ -481,6 +481,7 @@ NSString *const kMXKAttachmentErrorDomain = @"kMXKAttachmentErrorDomain";
             if (_isEncrypted)
             {
                 loader = [_mediaManager downloadEncryptedMediaFromMatrixContentFile:contentFile
+                                                                           mimeType:mimetype
                                                                            inFolder:_eventRoomId];
             }
             else

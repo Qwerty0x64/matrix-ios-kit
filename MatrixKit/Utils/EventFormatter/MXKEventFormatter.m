@@ -34,11 +34,6 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
 @interface MXKEventFormatter ()
 {
     /**
-     The default room summary updater from the MXSession.
-     */
-    MXRoomSummaryUpdater *defaultRoomSummaryUpdater;
-
-    /**
      The default CSS converted in DTCoreText object.
      */
     DTCSSStylesheet *dtCSS;
@@ -343,7 +338,7 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
         // Check whether redacted information is required
         if (_settings.showRedactionsInRoomHistory)
         {
-            NSLog(@"[MXKEventFormatter] Redacted event %@ (%@)", event.description, event.redactedBecause);
+            MXLogDebug(@"[MXKEventFormatter] Redacted event %@ (%@)", event.description, event.redactedBecause);
             
             NSString *redactorId = event.redactedBecause[@"sender"];
             NSString *redactedBy = @"";
@@ -1076,7 +1071,7 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
                            && event.decryptionError.code == MXDecryptingErrorDuplicateMessageIndexCode)
                     {
                         // Hide duplicate message warnings
-                        NSLog(@"[MXKEventFormatter] Warning: Duplicate message with error description %@", event.decryptionError);
+                        MXLogDebug(@"[MXKEventFormatter] Warning: Duplicate message with error description %@", event.decryptionError);
                         displayText = nil;
                     }
                     else
@@ -1286,7 +1281,7 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
                         // Check attachment validity
                         if (![self isSupportedAttachment:event])
                         {
-                            NSLog(@"[MXKEventFormatter] Warning: Unsupported attachment %@", event.description);
+                            MXLogDebug(@"[MXKEventFormatter] Warning: Unsupported attachment %@", event.description);
                             body = [NSBundle mxk_localizedStringForKey:@"notice_invalid_attachment"];
                             *error = MXKEventFormatterErrorUnsupported;
                         }
@@ -1296,7 +1291,7 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
                         body = body? body : [NSBundle mxk_localizedStringForKey:@"notice_audio_attachment"];
                         if (![self isSupportedAttachment:event])
                         {
-                            NSLog(@"[MXKEventFormatter] Warning: Unsupported attachment %@", event.description);
+                            MXLogDebug(@"[MXKEventFormatter] Warning: Unsupported attachment %@", event.description);
                             if (_isForSubtitle || !_settings.showUnsupportedEventsInRoomHistory)
                             {
                                 body = [NSBundle mxk_localizedStringForKey:@"notice_invalid_attachment"];
@@ -1313,7 +1308,7 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
                         body = body? body : [NSBundle mxk_localizedStringForKey:@"notice_video_attachment"];
                         if (![self isSupportedAttachment:event])
                         {
-                            NSLog(@"[MXKEventFormatter] Warning: Unsupported attachment %@", event.description);
+                            MXLogDebug(@"[MXKEventFormatter] Warning: Unsupported attachment %@", event.description);
                             if (_isForSubtitle || !_settings.showUnsupportedEventsInRoomHistory)
                             {
                                 body = [NSBundle mxk_localizedStringForKey:@"notice_invalid_attachment"];
@@ -1330,7 +1325,7 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
                         body = body? body : [NSBundle mxk_localizedStringForKey:@"notice_location_attachment"];
                         if (![self isSupportedAttachment:event])
                         {
-                            NSLog(@"[MXKEventFormatter] Warning: Unsupported attachment %@", event.description);
+                            MXLogDebug(@"[MXKEventFormatter] Warning: Unsupported attachment %@", event.description);
                             if (_isForSubtitle || !_settings.showUnsupportedEventsInRoomHistory)
                             {
                                 body = [NSBundle mxk_localizedStringForKey:@"notice_invalid_attachment"];
@@ -1348,7 +1343,7 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
                         // Check attachment validity
                         if (![self isSupportedAttachment:event])
                         {
-                            NSLog(@"[MXKEventFormatter] Warning: Unsupported attachment %@", event.description);
+                            MXLogDebug(@"[MXKEventFormatter] Warning: Unsupported attachment %@", event.description);
                             body = [NSBundle mxk_localizedStringForKey:@"notice_invalid_attachment"];
                             *error = MXKEventFormatterErrorUnsupported;
                         }
@@ -1368,17 +1363,38 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
                     // Build the full emote string after the body message formatting
                     if ([msgtype isEqualToString:kMXMessageTypeEmote])
                     {
+                        __block NSUInteger insertAt = 0;
+
+                        // For replies, look for the end of the parent message
+                        // This helps us insert the emote prefix in the right place
+                        NSDictionary *relatesTo;
+                        MXJSONModelSetDictionary(relatesTo, event.content[@"m.relates_to"]);
+                        if ([relatesTo[@"m.in_reply_to"] isKindOfClass:NSDictionary.class])
+                        {
+                            [attributedDisplayText enumerateAttribute:kMXKToolsBlockquoteMarkAttribute
+                                                              inRange:NSMakeRange(0, attributedDisplayText.length)
+                                                              options:(NSAttributedStringEnumerationReverse)
+                                                           usingBlock:^(id value, NSRange range, BOOL *stop) {
+                                insertAt = range.location;
+                                *stop = YES;
+                            }];
+                        }
+
                         // Always use default font and color for the emote prefix
                         NSString *emotePrefix = [NSString stringWithFormat:@"* %@ ", senderDisplayName];
-                        NSMutableAttributedString *newAttributedDisplayText =
-                        [[NSMutableAttributedString alloc] initWithString:emotePrefix
-                                                               attributes:@{
-                                                                            NSForegroundColorAttributeName: _defaultTextColor,
-                                                                            NSFontAttributeName: _defaultTextFont
-                                                                            }];
+                        NSAttributedString *attributedEmotePrefix =
+                        [[NSAttributedString alloc] initWithString:emotePrefix
+                                                        attributes:@{
+                                                                    NSForegroundColorAttributeName: _defaultTextColor,
+                                                                    NSFontAttributeName: _defaultTextFont
+                                                                    }];
 
-                        // Then, append the styled body message
-                        [newAttributedDisplayText appendAttributedString:attributedDisplayText];
+                        // Then, insert the emote prefix at the start of the message
+                        // (location varies depending on whether it was a reply)
+                        NSMutableAttributedString *newAttributedDisplayText =
+                        [[NSMutableAttributedString alloc] initWithAttributedString:attributedDisplayText];
+                        [newAttributedDisplayText insertAttributedString:attributedEmotePrefix
+                                                                 atIndex:insertAt];
                         attributedDisplayText = newAttributedDisplayText;
                     }
                 }
@@ -1558,7 +1574,7 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
                 // Check sticker validity
                 if (![self isSupportedAttachment:event])
                 {
-                    NSLog(@"[MXKEventFormatter] Warning: Unsupported sticker %@", event.description);
+                    MXLogDebug(@"[MXKEventFormatter] Warning: Unsupported sticker %@", event.description);
                     body = [NSBundle mxk_localizedStringForKey:@"notice_invalid_attachment"];
                     *error = MXKEventFormatterErrorUnsupported;
                 }
@@ -1581,7 +1597,7 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
     
     if (!attributedDisplayText)
     {
-        NSLog(@"[MXKEventFormatter] Warning: Unsupported event %@)", event.description);
+        MXLogDebug(@"[MXKEventFormatter] Warning: Unsupported event %@)", event.description);
         if (_settings.showUnsupportedEventsInRoomHistory)
         {
             if (MXKEventFormatterErrorNone == *error)
@@ -1812,12 +1828,6 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
         html = [html stringByReplacingCharactersInRange:inReplyToLinkRange withString:@"#"];
     }
     
-    // <blockquote> content in a reply-to message must be under a <p> child like
-    // other quoted messages. Else it breaks the workaround we use to display
-    // the vertical bar on blockquotes with DTCoreText
-    html = [html stringByReplacingOccurrencesOfString:@"<mx-reply><blockquote>" withString:@"<blockquote><p>"];
-    html = [html stringByReplacingOccurrencesOfString:@"</blockquote></mx-reply>" withString:@"</p></blockquote>"];
-    
     return html;
 }
 
@@ -1901,18 +1911,18 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
 {
     // We build strings containing the sender displayname (ex: "Bob: Hello!")
     // If a sender changes his displayname, we need to update the lastMessage.
-    MXEvent *lastMessageEvent;
+    MXRoomLastMessage *lastMessage;
     for (MXEvent *event in stateEvents)
     {
         if (event.isUserProfileChange)
         {
-            if (!lastMessageEvent)
+            if (!lastMessage)
             {
                 // Load lastMessageEvent on demand to save I/O
-                lastMessageEvent = summary.lastMessageEvent;
+                lastMessage = summary.lastMessage;
             }
 
-            if ([event.sender isEqualToString:lastMessageEvent.sender])
+            if ([event.sender isEqualToString:lastMessage.sender])
             {
                 // The last message must be recomputed
                 [summary resetLastMessage:nil failure:nil commit:YES];
@@ -1931,7 +1941,7 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
 - (BOOL)session:(MXSession *)session updateRoomSummary:(MXRoomSummary *)summary withLastEvent:(MXEvent *)event eventState:(MXRoomState *)eventState roomState:(MXRoomState *)roomState
 {
     // Use the default updater as first pass
-    MXEvent *currentlastMessageEvent = summary.lastMessageEvent;
+    MXRoomLastMessage *currentlastMessage = summary.lastMessage;
     BOOL updated = [defaultRoomSummaryUpdater session:session updateRoomSummary:summary withLastEvent:event eventState:eventState roomState:roomState];
     if (updated)
     {
@@ -1947,16 +1957,21 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
             // @TODO: there is a conflict with what [defaultRoomSummaryUpdater updateRoomSummary] did :/
             updated = NO;
             // Restore the previous lastMessageEvent
-            summary.lastMessageEvent = currentlastMessageEvent;
+            [summary updateLastMessage:currentlastMessage];
         }
         else
         {
-            summary.lastMessageString = lastMessageString;
+            summary.lastMessage.text = lastMessageString;
+            
+            if (summary.lastMessage.others == nil)
+            {
+                summary.lastMessage.others = [NSMutableDictionary dictionary];
+            }
             
             // Store the potential error
-            summary.lastMessageOthers[@"mxkEventFormatterError"] = @(error);
+            summary.lastMessage.others[@"mxkEventFormatterError"] = @(error);
             
-            summary.lastMessageOthers[@"lastEventDate"] = [self dateStringFromEvent:event withTime:YES];
+            summary.lastMessage.others[@"lastEventDate"] = [self dateStringFromEvent:event withTime:YES];
 
             // Check whether the sender name has to be added
             NSString *prefix = nil;
@@ -1977,7 +1992,7 @@ static NSString *const kHTMLATagRegexPattern = @"<a href=\"(.*?)\">([^<]*)</a>";
             }
 
             // Compute the attribute text message
-            summary.lastMessageAttributedString = [self renderString:summary.lastMessageString withPrefix:prefix forEvent:event];
+            summary.lastMessage.attributedText = [self renderString:summary.lastMessage.text withPrefix:prefix forEvent:event];
         }
     }
     

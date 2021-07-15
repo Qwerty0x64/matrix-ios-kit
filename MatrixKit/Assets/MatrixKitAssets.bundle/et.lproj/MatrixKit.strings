@@ -369,7 +369,7 @@
 "settings_config_user_id" = "Kasutajatunnus: %@";
 // call string
 "call_waiting" = "Ootan...";
-"call_connecting" = "Kõne on ühendamisel...";
+"call_connecting" = "Kõne on ühendamisel…";
 "call_ended" = "Kõne lõppes";
 "call_ring" = "Helistan...";
 "incoming_video_call" = "Saabuv videokõne";
@@ -446,7 +446,7 @@
 "notice_room_history_visible_to_members_from_joined_point_by_you_for_dm" = "Sina määrasid, et jututoa tulevane ajalugu on nähtav kõikidele selle liikmetele nende liitumise hetkest.";
 "call_more_actions_dialpad" = "Numbriklahvistik";
 "call_more_actions_transfer" = "Suuna kõne edasi";
-"call_more_actions_audio_use_device" = "Kasuta seadme kõlarit ja mikrofoni";
+"call_more_actions_audio_use_device" = "Kasuta seadme kõlarit";
 "call_more_actions_audio_use_headset" = "Kasuta kõrvaklappe";
 "call_more_actions_change_audio_device" = "Muuda heliseadet";
 "call_more_actions_unhold" = "Jätka";
@@ -456,3 +456,10 @@
 "notice_declined_video_call_by_you" = "Sina keeldusid kõnest";
 "notice_declined_video_call" = "%@ keeldus kõnest";
 "resume_call" = "Jätka";
+"call_consulting_with_user" = "Pean nõu kasutajaga %@";
+"call_transfer_to_user" = "Suunan kõne kasutajale %@";
+"call_video_with_user" = "Videokõne kasutajaga %@";
+"call_voice_with_user" = "Häälkõne kasutajaga %@";
+"call_ringing" = "Helistan…";
+"e2e_passphrase_too_short" = "Salafraas on liiga lühike (pikkus peaks olema vähemalt %d tähemärki)";
+"microphone_access_not_granted_for_voice_message" = "Häälsõnumite salvestamiseks on vajalik ligipääs mikrofonile, kuid %@'l pole selleks õigusi";

@@ -89,6 +89,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *authSwitchButton;
 
 @property (strong, nonatomic) IBOutlet UIActivityIndicatorView *authenticationActivityIndicator;
+@property (weak, nonatomic) IBOutlet UIView *authenticationActivityIndicatorContainerView;
 @property (weak, nonatomic) IBOutlet UILabel *noFlowLabel;
 @property (weak, nonatomic) IBOutlet UIButton *retryButton;
 
@@ -146,6 +147,11 @@
  The delegate for the view controller.
  */
 @property (nonatomic) id<MXKAuthenticationViewControllerDelegate> delegate;
+
+/**
+ current ongoing MXHTTPOperation. Nil if none.
+ */
+@property (nonatomic, nullable, readonly) MXHTTPOperation *currentHttpOperation;
 
 /**
  Returns the `UINib` object initialized for a `MXKAuthenticationViewController`.

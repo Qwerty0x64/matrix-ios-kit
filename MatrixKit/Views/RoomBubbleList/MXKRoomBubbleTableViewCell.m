@@ -898,7 +898,7 @@ static BOOL _disableLongPressGestureOnEvent;
                 
                 void (^onFailure)(NSError *) = ^(NSError *error){
                     
-                    NSLog(@"[MXKRoomBubbleTableViewCell] gif download failed");
+                    MXLogDebug(@"[MXKRoomBubbleTableViewCell] gif download failed");
                     // Notify the end user
                     [[NSNotificationCenter defaultCenter] postNotificationName:kMXKErrorNotification object:error];
                 };
@@ -1092,7 +1092,7 @@ API_AVAILABLE(ios(10.0)) {
 - (BOOL)isBubbleDataContainsFileAttachment
 {
     return bubbleData.attachment
-    && (bubbleData.attachment.type == MXKAttachmentTypeFile || bubbleData.attachment.type == MXKAttachmentTypeAudio)
+    && (bubbleData.attachment.type == MXKAttachmentTypeFile || bubbleData.attachment.type == MXKAttachmentTypeAudio || bubbleData.attachment.type == MXKAttachmentTypeVoiceMessage)
     && bubbleData.attachment.contentURL
     && bubbleData.attachment.contentInfo;
 }

@@ -17,10 +17,214 @@ Changes to be released in next version
  * 
     
 🧱 Build
+ * 
+
+Others
+ * 
+
+Changes in 0.15.4 (2021-07-15)
+=================================================
+
+✨ Features
+ * 
+
+🙌 Improvements
+ * MXKAttachment: Add support for all voice message types (vector-im/element-ios/issues/4094).
+ * MXKRoomViewController, MXKRoomDataSource & MXKRoomInputToolbarView: Add methods to send videos as `AVAsset` objects (vector-im/element-ios/issues/4483).
+ * MXKSendReplyEventStringLocalizations: Added senderSentAVoiceMessage property
+
+🐛 Bugfix
+ * 
+
+⚠️ API Changes
+ * MXRoomDataSource: Added duration and sample parameters on the sendVoiceMessage method (vector-im/element-ios/issues/4090)
+
+🗣 Translations
+ * 
+    
+🧱 Build
+ * 
+
+Others
+ * 
+
+Improvements:
+ * Upgrade MatrixSDK version ([v0.19.4](https://github.com/matrix-org/matrix-ios-sdk/releases/tag/v0.19.4)).
+
+Changes in 0.15.3 (2021-06-30)
+=================================================
+
+✨ Features
+ * 
+
+🙌 Improvements
+ * MXKCallViewController: Adapt new audio routing APIs.
+ * MXKAuthenticationViewController: Add authentication indicator container outlet (vector-im/element-ios/issues/4485).
+
+🐛 Bugfix
+ * 
+
+⚠️ API Changes
+ * 
+
+🗣 Translations
+ * 
+    
+🧱 Build
+ * 
+
+Others
+ * 
+
+Improvements:
+ * Upgrade MatrixSDK version ([v0.19.3](https://github.com/matrix-org/matrix-ios-sdk/releases/tag/v0.19.3)).
+
+Changes in 0.15.2 (2021-06-24)
+=================================================
+
+✨ Features
+ * 
+
+🙌 Improvements
+ * 
+
+🐛 Bugfix
+ * 
+
+⚠️ API Changes
+ * MXKAttachment: Added MXKAttachmentTypeVoiceMessage attachment type (vector-im/element-ios/issues/4090).
+
+🗣 Translations
+ * 
+    
+🧱 Build
+ * 
+
+Others
+ * 
+
+Improvements:
+ * Upgrade MatrixSDK version ([v0.19.2](https://github.com/matrix-org/matrix-ios-sdk/releases/tag/v0.19.2)).
+
+Changes in 0.15.1 (2021-06-21)
+=================================================
+
+✨ Features
+ * 
+
+🙌 Improvements
+ * MXRoomSummary: Adapt removal of `lastMessageEvent` property (vector-im/element-ios/issues/4360).
+ * MXKAttachment: Adapt removal of `mimetype` fields (vector-im/element-ios/issues/4303).
+
+🐛 Bugfix
+ * MXKCallViewController: Fix status text of a remotely held call.
+ * MXKCallViewController: Fix avatar image for outgoing on hold calls.
+ * MXKRoomViewController: Fix virtual timeline issues.
+ * MXKEventFormatter: Style blockquotes as blocks, fixing fallback display (#836).
+ * MXKEventFormatter: Fix display of emote replies (vector-im/element-ios/issues/4081).
+
+⚠️ API Changes
+ * Exposed methods for sending audio files and voice messages (vector-im/element-ios/issues/4090).
+
+🗣 Translations
+ * 
+    
+🧱 Build
+ * 
+
+Others
+ * 
+
+Improvements:
+ * Upgrade MatrixSDK version ([v0.19.1](https://github.com/matrix-org/matrix-ios-sdk/releases/tag/v0.19.1)).
+
+Changes in 0.15.0 (2021-06-02)
+=================================================
+
+✨ Features
+ * 
+
+🙌 Improvements
+ * MXKRoomDataSource: Decrypt unsent messages to follow MatrixSDK changes.
+ * MXKEncryptionKeysExportView: Define a minimum size for the passphrase.
+ * Pod: Update Down to 0.11.0.
+ * Logging: Adopted MXLog throughout (vector-im/element-ios/issues/4351)
+
+🐛 Bugfix
+ * MXKAccount: Do not propagate errors for timed out initial sync requests (vector-im/element-ios/issues/4054).
+
+⚠️ API Changes
+ * 
+
+🗣 Translations
+ * 
+    
+🧱 Build
+ * 
+
+Others
+ * 
+
+Improvements:
+ * Upgrade MatrixSDK version ([v0.19.0](https://github.com/matrix-org/matrix-ios-sdk/releases/tag/v0.19.0)).
+
+Changes in 0.14.12 (2021-05-12)
+=================================================
+
+✨ Features
+ * 
+
+🙌 Improvements
+ * 
+
+🐛 Bugfix
+ * 
+
+⚠️ API Changes
+ * 
+
+🗣 Translations
+ * 
+    
+🧱 Build
+ * 
+
+Others
+ * 
+
+Improvements:
+ * Upgrade MatrixSDK version ([v0.18.12](https://github.com/matrix-org/matrix-ios-sdk/releases/tag/v0.18.12)).
+
+Changes in 0.14.11 (2021-05-07)
+=================================================
+
+✨ Features
+ * 
+
+🙌 Improvements
+ * MXKEventFormatter: Expose defaultRoomSummaryUpdater ivar as protected.
+ * MXKCallViewController: Add transfer button and implement actions.
+ * MXKAuthenticationVC: Expose current HTTP Operation (vector-im/element-ios/issues/4276)
+ * MXKAccount: Log reasons for incompatible sync filter (vector-im/element-ios/issues/3921).
+ * MXKCallViewController: Handle asserted identity updates.
+
+🐛 Bugfix
+ * 
+
+⚠️ API Changes
+ * 
+
+🗣 Translations
+ * 
+    
+🧱 Build
  * CI: Introduce GH actions.
 
 Others
  * 
+
+Improvements:
+ * Upgrade MatrixSDK version ([v0.18.11](https://github.com/matrix-org/matrix-ios-sdk/releases/tag/v0.18.11)).
 
 Changes in 0.14.10 (2021-04-22)
 =================================================

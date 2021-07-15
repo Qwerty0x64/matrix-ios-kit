@@ -46,12 +46,6 @@
  */
 - (void)callViewControllerDidTapOnHoldCall:(MXKCallViewController *)callViewController;
 
-/**
- Tells the delegate that user tapped PiP button.
- @param callViewController the call view controller.
- */
-- (void)callViewControllerDidTapPiPButton:(MXKCallViewController *)callViewController;
-
 @end
 
 extern NSString *const kMXKCallViewControllerWillAppearNotification;
@@ -68,6 +62,7 @@ extern NSString *const kMXKCallViewControllerBackToAppNotification;
 @property (weak, nonatomic) IBOutlet MXKImageView *backgroundImageView;
 
 @property (weak, nonatomic, readonly) IBOutlet UIView *localPreviewContainerView;
+@property (weak, nonatomic, readonly) IBOutlet UIView *localPreviewVideoView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *localPreviewActivityView;
 
 @property (weak, nonatomic, readonly) IBOutlet UIView *onHoldCallContainerView;
@@ -89,11 +84,11 @@ extern NSString *const kMXKCallViewControllerBackToAppNotification;
 @property (weak, nonatomic) IBOutlet UIButton *endCallButton;
 
 @property (weak, nonatomic) IBOutlet UIView *callControlContainerView;
-@property (weak, nonatomic) IBOutlet UIButton *pipButton;
 @property (weak, nonatomic) IBOutlet UIButton *speakerButton;
 @property (weak, nonatomic) IBOutlet UIButton *audioMuteButton;
 @property (weak, nonatomic) IBOutlet UIButton *videoMuteButton;
-@property (weak, nonatomic) IBOutlet UIButton *moreButton;
+@property (weak, nonatomic) IBOutlet UIButton *moreButtonForVoice;
+@property (weak, nonatomic) IBOutlet UIButton *moreButtonForVideo;
 
 @property (weak, nonatomic) IBOutlet UIButton *backToAppButton;
 @property (weak, nonatomic) IBOutlet UIButton *cameraSwitchButton;
@@ -102,6 +97,8 @@ extern NSString *const kMXKCallViewControllerBackToAppNotification;
 @property (unsafe_unretained, nonatomic) IBOutlet NSLayoutConstraint *localPreviewContainerViewTopConstraint;
 @property (unsafe_unretained, nonatomic) IBOutlet NSLayoutConstraint *localPreviewContainerViewHeightConstraint;
 @property (unsafe_unretained, nonatomic) IBOutlet NSLayoutConstraint *localPreviewContainerViewWidthConstraint;
+
+@property (weak, nonatomic) IBOutlet UIButton *transferButton;
 
 /**
  The default picture displayed when no picture is available.
@@ -112,6 +109,11 @@ extern NSString *const kMXKCallViewControllerBackToAppNotification;
  The call status bar displayed on the top of the app during a call.
  */
 @property (nonatomic, readonly) UIWindow *backToAppStatusWindow;
+
+/**
+ Flag whether this call screen is displaying an alert right now.
+ */
+@property (nonatomic, readonly, getter=isDisplayingAlert) BOOL displayingAlert;
 
 /**
  The current call
@@ -213,6 +215,16 @@ extern NSString *const kMXKCallViewControllerBackToAppNotification;
  Action registered on the event 'UIControlEventTouchUpInside' for each UIButton instance.
  */
 - (IBAction)onButtonPressed:(id)sender;
+
+/**
+ Default implementation presents an action sheet with proper options. Override to change the user interface.
+ */
+- (void)showAudioDeviceOptions;
+
+/**
+ Default implementation makes the button selected for loud speakers and external device options, non-selected for built-in device.
+ */
+- (void)configureSpeakerButton;
 
 #pragma mark - DTMF
 

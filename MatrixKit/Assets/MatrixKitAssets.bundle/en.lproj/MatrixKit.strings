@@ -255,6 +255,7 @@
 "message_reply_to_sender_sent_an_image" = "sent an image.";
 "message_reply_to_sender_sent_a_video" = "sent a video.";
 "message_reply_to_sender_sent_an_audio_file" = "sent an audio file.";
+"message_reply_to_sender_sent_a_voice_message" = "sent a voice message.";
 "message_reply_to_sender_sent_a_file" = "sent a file.";
 "message_reply_to_message_to_reply_to_prefix" = "In reply to";
 
@@ -305,6 +306,7 @@
 "e2e_export" = "Export";
 "e2e_passphrase_confirm" = "Confirm passphrase";
 "e2e_passphrase_empty" = "Passphrase must not be empty";
+"e2e_passphrase_too_short" = "Passphrase too short (It must be at a minimum %d characters in length)";
 "e2e_passphrase_not_match" = "Passphrases must match";
 "e2e_passphrase_create" = "Create passphrase";
 
@@ -330,6 +332,8 @@
 
 "local_contacts_access_discovery_warning_title" = "Users discovery";
 "local_contacts_access_discovery_warning" = "To discover contacts already using Matrix, %@ can send email addresses and phone numbers in your address book to your chosen Matrix identity server. Where supported, personal data is hashed before sending - please check your identity server's privacy policy for more details.";
+
+"microphone_access_not_granted_for_voice_message" = "Voice messages require access to the Microphone but %@ doesn't have permission to use it";
 
 // Country picker
 "country_picker_title" = "Choose a country";
@@ -531,10 +535,9 @@
 // Settings keys 
 
 // call string
-"call_waiting" = "Waiting...";
-"call_connecting" = "Call connecting...";
+"call_connecting" = "Connecting…";
+"call_ringing" = "Ringing…";
 "call_ended" = "Call ended";
-"call_ring" = "Calling...";
 "incoming_video_call" = "Incoming Video Call";
 "incoming_voice_call" = "Incoming Voice Call";
 "call_invite_expired" = "Call Invite Expired";
@@ -543,10 +546,13 @@
 "call_more_actions_hold" = "Hold";
 "call_more_actions_unhold" = "Resume";
 "call_more_actions_change_audio_device" = "Change Audio Device";
-"call_more_actions_audio_use_headset" = "Use Headset Audio";
-"call_more_actions_audio_use_device" = "Use Device Audio";
+"call_more_actions_audio_use_device" = "Device Speaker";
 "call_more_actions_transfer" = "Transfer";
 "call_more_actions_dialpad" = "Dial pad";
+"call_voice_with_user" = "Voice call with %@";
+"call_video_with_user" = "Video call with %@";
+"call_consulting_with_user" = "Consulting with %@";
+"call_transfer_to_user" = "Transfer to %@";
 
 // unrecognized SSL certificate
 "ssl_trust" = "Trust";

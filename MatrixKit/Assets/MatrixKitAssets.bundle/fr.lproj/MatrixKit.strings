@@ -337,7 +337,7 @@
 "settings_config_user_id" = "Identifiant utilisateur : %@";
 // call string
 "call_waiting" = "En attente…";
-"call_connecting" = "Appel en cours d’établissement…";
+"call_connecting" = "Connexion…";
 "call_ended" = "Appel terminé";
 "call_ring" = "Appel…";
 "incoming_video_call" = "Appel vidéo entrant";
@@ -447,7 +447,7 @@
 "notice_room_name_removed_for_dm" = "%@ a supprimé le nom";
 "call_more_actions_dialpad" = "Pavé de numérotation";
 "call_more_actions_transfer" = "Transférer";
-"call_more_actions_audio_use_device" = "Utiliser l’audio de l’appareil";
+"call_more_actions_audio_use_device" = "Haut parleur de l’appareil";
 "call_more_actions_audio_use_headset" = "Utiliser les écouteurs";
 "call_more_actions_change_audio_device" = "Changer de périphérique audio";
 "call_more_actions_unhold" = "Reprendre";
@@ -457,3 +457,10 @@
 "notice_declined_video_call_by_you" = "Vous avez refusé l’appel";
 "notice_declined_video_call" = "%@ a refusé l’appel";
 "resume_call" = "Reprendre";
+"call_transfer_to_user" = "Transfert à %@";
+"call_consulting_with_user" = "Consultation de %@";
+"call_video_with_user" = "Appel vidéo avec %@";
+"call_voice_with_user" = "Appel audio avec %@";
+"call_ringing" = "Sonnerie…";
+"e2e_passphrase_too_short" = "La phrase secrète est trop courte, elle doit compter au moins %d caractères";
+"microphone_access_not_granted_for_voice_message" = "Pour les messages vocaux, l’accès au microphone est indispensable mais %@ n’a pas les permissions nécessaires";

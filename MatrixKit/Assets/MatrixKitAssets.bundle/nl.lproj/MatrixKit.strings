@@ -393,7 +393,7 @@
 
 // call string
 "call_waiting" = "In afwachting…";
-"call_connecting" = "Oproep verbinden…";
+"call_connecting" = "Verbinden…";
 "call_ended" = "Oproep beëindigd";
 "call_ring" = "Bellen…";
 "incoming_video_call" = "Inkomende video-oproep";
@@ -508,7 +508,7 @@
 "notice_room_join_rule_invite_for_dm" = "%@ heeft dit gesprek alleen op uitnodiging gemaakt.";
 "call_more_actions_dialpad" = "Kiestoetsen";
 "call_more_actions_transfer" = "Doorschakelen";
-"call_more_actions_audio_use_device" = "Audio-apparaat gebruiken";
+"call_more_actions_audio_use_device" = "Ingebouwde Luidspreker";
 "call_more_actions_audio_use_headset" = "Audio-koptelefoon gebruiken";
 "call_more_actions_change_audio_device" = "Audio-apparaat wisselen";
 "call_more_actions_unhold" = "Hervatten";
@@ -518,3 +518,10 @@
 "notice_declined_video_call_by_you" = "U heeft de oproep afgewezen";
 "notice_declined_video_call" = "%@ heeft de oproep afgewezen";
 "resume_call" = "Hervatten";
+"call_consulting_with_user" = "In de wacht bij %@";
+"call_transfer_to_user" = "Doorverbinden met %@";
+"call_video_with_user" = "Video-oproep met %@";
+"call_voice_with_user" = "Spraakoproep met %@";
+"call_ringing" = "Bellen…";
+"e2e_passphrase_too_short" = "Wachtwoord is te kort (hij moet minimaal %d tekens lang zijn)";
+"microphone_access_not_granted_for_voice_message" = "Spraakberichten vereisen toegang tot de Microfoon maar %@ heeft geen toestemming om het te gebruiken";

@@ -349,7 +349,7 @@
 "settings_config_user_id" = "Felhasználói azonosító: %@";
 // call string
 "call_waiting" = "Vár...";
-"call_connecting" = "Kapcsolás folyamatban...";
+"call_connecting" = "Kapcsolás…";
 "call_ended" = "Hívás vége";
 "call_ring" = "Hívás...";
 "incoming_video_call" = "Érkező videó hívás";
@@ -447,7 +447,7 @@
 "notice_room_history_visible_to_members_from_joined_point_by_you_for_dm" = "A jövőbeni üzeneteket láthatóvá tetted mindenki számára a belépésük pillanatától.";
 "call_more_actions_dialpad" = "Tárcsázó számlap";
 "call_more_actions_transfer" = "Átadás";
-"call_more_actions_audio_use_device" = "Hangeszköz használata";
+"call_more_actions_audio_use_device" = "Eszköz hangszóró";
 "call_more_actions_audio_use_headset" = "Fejhallgató használata";
 "call_more_actions_change_audio_device" = "Hang eszköz megváltoztatása";
 "call_more_actions_unhold" = "Folytatás";
@@ -457,3 +457,10 @@
 "notice_declined_video_call_by_you" = "Elutasította a hívást";
 "notice_declined_video_call" = "%@ elutasította a hívást";
 "resume_call" = "Folytatás";
+"call_transfer_to_user" = "Hívásátirányítás ide: %@";
+"call_consulting_with_user" = "Konzultáció vele: %@";
+"call_video_with_user" = "Videóhívás vele: %@";
+"call_voice_with_user" = "Hanghívás vele: %@";
+"call_ringing" = "Hívás…";
+"e2e_passphrase_too_short" = "A jelmondat túl rövid (legalább %d karakter hosszúnak kell lennie)";
+"microphone_access_not_granted_for_voice_message" = "Ha hangüzenetekhez a mikrofonhoz szükséges a hozzáférés, de %@ nem rendelkezik a használatához szükséges engedéllyel";
